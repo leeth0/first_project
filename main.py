@@ -18,6 +18,4 @@ st.markdown(
     .message-box {
         border: 3px solid #FFD700;
         background: #FFF8DC;
-        border-radius: 15px;
-        padding: 30px;
-
+        border
