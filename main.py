@@ -4,7 +4,7 @@ import random
 st.title("🧠 비즈니스 상황 선택 게임")
 st.markdown("무작위로 제시되는 경영 상황에서 올바른 결정을 내려보세요!")
 
-# 시나리오 목록
+# 다양한 시나리오 정의
 scenarios = [
     {
         "situation": "📉 당신의 스타트업이 예상보다 빠르게 자금을 소모하고 있습니다. 무엇을 하시겠습니까?",
@@ -73,27 +73,35 @@ scenarios = [
     }
 ]
 
-# 세션 상태에서 시나리오 고정
-if "selected_scenario" not in st.session_state:
-    st.session_state.selected_scenario = random.choice(scenarios)
+# 초기 상태 설정
+if "scenario_index" not in st.session_state:
+    st.session_state.scenario_index = random.randint(0, len(scenarios)-1)
 
-scenario = st.session_state.selected_scenario
+if "show_result" not in st.session_state:
+    st.session_state.show_result = False
 
-# 상황 출력
+# 현재 시나리오 선택
+scenario = scenarios[st.session_state.scenario_index]
+
+# 상황 및 선택지 출력
 st.subheader("📌 상황:")
 st.write(scenario["situation"])
 
-# 선택지 보여주기
-choice = st.radio("📝 당신의 선택은?", scenario["choices"])
+choice = st.radio("📝 당신의 선택은?", scenario["choices"], key="current_choice")
 
-# 결과 확인 버튼
-if st.button("결과 확인"):
-    selected_letter = choice.split(".")[0]
+# 결과 보기 버튼
+if st.button("결과 확인") and not st.session_state.show_result:
+    st.session_state.show_result = True
+
+# 결과 표시
+if st.session_state.show_result:
+    selected_letter = st.session_state.current_choice.split(".")[0]
     result = scenario["outcomes"].get(selected_letter, "결과 없음")
     st.markdown("🧾 **결과:**")
     st.success(result)
 
-    # 결과 본 뒤 다음 문제를 보고 싶을 경우
+    # 다음 문제로 넘어가기
     if st.button("다음 문제 보기"):
-        st.session_state.selected_scenario = random.choice(scenarios)
+        st.session_state.scenario_index = random.randint(0, len(scenarios)-1)
+        st.session_state.show_result = False
         st.experimental_rerun()
