@@ -1,40 +1,23 @@
 import streamlit as st
-import numpy as np
-import pandas as pd
 
-st.title("💼 가상 창업 시뮬레이션 게임")
+st.title("🧠 비즈니스 상황 선택 게임")
 
-st.markdown("초기 자본금과 업종을 선택하고, 마케팅 전략과 가격 정책을 정해 수익을 극대화해보세요!")
+st.markdown("아래 주어진 상황에 따라 의사결정을 내려보세요. 선택에 따라 결과가 달라집니다!")
 
-# Step 1: 업종 선택
-business_type = st.selectbox("업종을 선택하세요", ["카페", "온라인 쇼핑몰", "앱 서비스"])
+situation = "당신의 회사는 신제품을 출시했지만 매출이 기대에 못 미칩니다. 어떻게 하시겠습니까?"
+st.subheader("📌 상황:")
+st.write(situation)
 
-# Step 2: 초기 자본금 설정
-capital = st.slider("초기 자본금 (만원)", 100, 1000, 500, 50)
+choice = st.radio("당신의 선택은?", [
+    "A. 마케팅 예산을 2배로 늘린다",
+    "B. 제품 가격을 인하한다",
+    "C. 기능을 줄이고 가성비를 높인다"
+])
 
-# Step 3: 가격 전략
-price_level = st.selectbox("제품 가격 전략", ["저가", "중간", "고가"])
-
-# Step 4: 마케팅 투자
-marketing = st.slider("마케팅 예산 비율 (%)", 0, 50, 20)
-
-# Simulation logic
-base_demand = {"카페": 100, "온라인 쇼핑몰": 150, "앱 서비스": 200}[business_type]
-price_multiplier = {"저가": 0.8, "중간": 1.0, "고가": 1.2}[price_level]
-marketing_effect = marketing / 100
-
-# 시뮬레이션
-customers = int(base_demand * (1 + marketing_effect) * (1 if price_level == "중간" else (1.2 if price_level == "저가" else 0.8)))
-revenue = customers * price_multiplier * 1.0  # 단위 가격
-costs = capital * 0.3 + marketing * 10
-profit = revenue - costs
-
-st.metric("예상 고객 수", customers)
-st.metric("예상 매출", f"{revenue:.0f}만원")
-st.metric("예상 비용", f"{costs:.0f}만원")
-st.metric("예상 이익", f"{profit:.0f}만원")
-
-if profit > 0:
-    st.success("수익을 낼 수 있는 비즈니스 모델입니다!")
-else:
-    st.error("적자가 예상됩니다. 전략을 조정해보세요.")
+if st.button("결과 확인"):
+    if "마케팅" in choice:
+        st.success("고객 유입이 늘어났고 매출이 증가했습니다!")
+    elif "가격을 인하" in choice:
+        st.warning("매출은 늘었지만 이익률이 떨어졌습니다.")
+    else:
+        st.info("가성비로 인한 평가는 좋지만 고객 수는 큰 변화가 없었습니다.")
