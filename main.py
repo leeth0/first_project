@@ -81,6 +81,12 @@ if "show_result" not in st.session_state:
 if "current_choice" not in st.session_state:
     st.session_state.current_choice = None
 
+# 다음 문제 버튼 (가장 먼저 처리)
+if st.button("🔄 다음 문제 보기"):
+    st.session_state.scenario_index = random.randint(0, len(scenarios) - 1)
+    st.session_state.show_result = False
+    st.session_state.current_choice = None
+
 # 현재 시나리오 가져오기
 scenario = scenarios[st.session_state.scenario_index]
 
@@ -101,10 +107,3 @@ if st.session_state.show_result and st.session_state.current_choice:
     selected_letter = st.session_state.current_choice.split(".")[0]
     result = scenario["outcomes"].get(selected_letter, "결과 없음")
     st.success(f"🧾 결과: {result}")
-
-# 다음 문제 버튼 (결과 아래든 항상 보이게 설정)
-if st.button("🔄 다음 문제 보기"):
-    st.session_state.scenario_index = random.randint(0, len(scenarios) - 1)
-    st.session_state.show_result = False
-    st.session_state.current_choice = None
-    st.experimental_rerun()  # 앱 상태를 강제로 리프레시해서 문제 변경 반영
