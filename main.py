@@ -1,8 +1,8 @@
 import streamlit as st
-import random
+import time
 
 st.title("🧠 비즈니스 상황 선택 게임")
-st.markdown("무작위로 제시되는 경영 상황에서 올바른 결정을 내려보세요!")
+st.markdown("순차적으로 제시되는 경영 상황에서 올바른 결정을 내려보세요!")
 
 # 시나리오 목록
 scenarios = [
@@ -75,35 +75,58 @@ scenarios = [
 
 # 세션 상태 초기화
 if "scenario_index" not in st.session_state:
-    st.session_state.scenario_index = random.randint(0, len(scenarios) - 1)
+    st.session_state.scenario_index = 0  # 처음부터 시작
 if "show_result" not in st.session_state:
     st.session_state.show_result = False
 if "current_choice" not in st.session_state:
     st.session_state.current_choice = None
+if "reset_timer" not in st.session_state:
+    st.session_state.reset_timer = False
 
-# 다음 문제 버튼 (가장 먼저 처리)
-if st.button("🔄 다음 문제 보기"):
-    st.session_state.scenario_index = random.randint(0, len(scenarios) - 1)
-    st.session_state.show_result = False
-    st.session_state.current_choice = None
+index = st.session_state.scenario_index
 
-# 현재 시나리오 가져오기
-scenario = scenarios[st.session_state.scenario_index]
+# 모든 문제를 다 풀었을 때
+if index >= len(scenarios):
+    st.subheader("🎉 모든 문제가 끝났습니다. 고생하셨습니다! 🎉")
 
-# 상황 출력
-st.subheader("📌 상황:")
-st.write(scenario["situation"])
+    if not st.session_state.reset_timer:
+        st.session_state.reset_timer = True
+        st.session_state.reset_start = time.time()
 
-# 선택지 출력
-choice = st.radio("📝 당신의 선택은?", scenario["choices"], key="radio_choice")
+    elapsed = time.time() - st.session_state.reset_start
+    remaining = max(0, int(10 - elapsed))
+    st.write(f"처음으로 돌아갑니다... {remaining}초 남음")
 
-# 결과 확인 버튼
-if st.button("결과 확인"):
-    st.session_state.current_choice = choice
-    st.session_state.show_result = True
+    if elapsed >= 10:
+        st.session_state.scenario_index = 0
+        st.session_state.show_result = False
+        st.session_state.current_choice = None
+        st.session_state.reset_timer = False
+        st.experimental_rerun()
 
-# 결과 보여주기
-if st.session_state.show_result and st.session_state.current_choice:
-    selected_letter = st.session_state.current_choice.split(".")[0]
-    result = scenario["outcomes"].get(selected_letter, "결과 없음")
-    st.success(f"🧾 결과: {result}")
+else:
+    scenario = scenarios[index]
+
+    # 상황 출력
+    st.subheader("📌 상황:")
+    st.write(scenario["situation"])
+
+    # 선택지 출력
+    choice = st.radio("📝 당신의 선택은?", scenario["choices"], key="radio_choice")
+
+    # 결과 확인 버튼
+    if st.button("결과 확인"):
+        st.session_state.current_choice = choice
+        st.session_state.show_result = True
+
+    # 결과 보여주기
+    if st.session_state.show_result and st.session_state.current_choice:
+        selected_letter = st.session_state.current_choice.split(".")[0]
+        result = scenario["outcomes"].get(selected_letter, "결과 없음")
+        st.success(f"🧾 결과: {result}")
+
+        # 다음 문제 버튼
+        if st.button("🔄 다음 문제 보기"):
+            st.session_state.scenario_index += 1
+            st.session_state.show_result = False
+            st.session_state.current_choice = None
