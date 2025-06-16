@@ -73,18 +73,6 @@ scenarios = [
     }
 ]
 
-# 세션 상태 초기화
-if "scenario_index" not in st.session_state:
-    st.session_state.scenario_index = 0  # 처음부터 시작
-if "show_result" not in st.session_state:
-    st.session_state.show_result = False
-if "current_choice" not in st.session_state:
-    st.session_state.current_choice = None
-if "reset_timer" not in st.session_state:
-    st.session_state.reset_timer = False
-
-index = st.session_state.scenario_index
-
 # 모든 문제를 다 풀었을 때
 if index >= len(scenarios):
     st.subheader("🎉 모든 문제가 끝났습니다. 고생하셨습니다! 🎉")
